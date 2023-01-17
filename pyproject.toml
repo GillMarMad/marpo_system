@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "marpo-system"
+version = "0.1.0"
+description = "This system will be the API to provide data from a postgres DB in docker"
+authors = ["GillMarMad"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "marpo_system"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+alembic = "^1.9.2"
+sqlalchemy = "^1.4.46"
+pydantic = "^1.10.4"
+psycopg2 = "^2.9.5"
+fastapi = "^0.89.1"
+uvicorn = "^0.20.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
