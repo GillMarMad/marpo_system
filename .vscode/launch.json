@@ -1,16 +1,30 @@
+// {
+//     "version": "0.2.0",
+//     "configurations": [
+//         {
+//             "name": "Python: FastAPI",
+//             "type": "python",
+//             "request": "launch",
+//             "module": "uvicorn",
+//             "args": [
+//                 "app.main:app",
+//                 "--reload"
+//             ],
+//             "jinja": true
+//         }
+//     ]
+// }
+
+
 {
-    "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: FastAPI",
+            "name": "Python: File",
             "type": "python",
             "request": "launch",
-            "module": "uvicorn",
-            "args": [
-                "app.main:app",
-                "--reload"
-            ],
-            "jinja": true
+            "program": "app\\main.py",
+            "args": ["--reload"],
+            "justMyCode": true
         }
     ]
 }

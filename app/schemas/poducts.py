@@ -17,4 +17,5 @@ class Product(BaseModel):
     inventory: int
     min_inventory: int
     department: str
+    id: int
     LastUpdate: datetime

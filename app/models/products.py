@@ -1,4 +1,4 @@
-from app.db.base_class import Base
+from db.base_class import Base
 from sqlalchemy import Boolean, Column, String, DateTime,Integer, Float
 from datetime import datetime
 
@@ -7,8 +7,8 @@ class Product(Base):
                 index=True, nullable=False)
     code = Column(Integer, unique=True, nullable=True)
     codebar = Column(String, unique=True, nullable=True)
-    codebarInner = Column(String, unique=True, nullable=True)
-    codebarMaster = Column(String, unique=True, nullable=True)
+    codebarinner = Column(String, unique=True, nullable=True)
+    codebarmaster = Column(String, unique=True, nullable=True)
     unit = Column(String, nullable=False)
     description = Column(String, nullable=False)
     brand = Column(String, nullable=True)
@@ -18,4 +18,5 @@ class Product(Base):
     inventory = Column(Integer, nullable=True)
     min_inventory = Column(Integer, nullable=True)
     department = Column(String, nullable=True)
+    id = Column(Integer, unique=False, nullable=True)
     LastUpdate = Column(DateTime, default=datetime.now())

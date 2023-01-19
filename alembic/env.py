@@ -1,6 +1,6 @@
 from logging.config import fileConfig
 from app.db.base import Base
-from app.core.config import Settings
+from app.core.config import settings
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
@@ -26,11 +26,11 @@ target_metadata = Base.metadata
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 def get_url():
-    POSTGRES_USER: str = Settings.POSTGRES_USER
-    POSTGRES_PASSWORD = Settings.POSTGRES_PASSWORD
-    POSTGRES_SERVER: str = Settings.POSTGRES_SERVER
-    POSTGRES_DB: str = Settings.POSTGRES_DB
-    POSTGRES_PORT: str = Settings.POSTGRES_PORT
+    POSTGRES_USER: str = settings.POSTGRES_USER
+    POSTGRES_PASSWORD = settings.POSTGRES_PASSWORD
+    POSTGRES_SERVER: str = settings.POSTGRES_SERVER
+    POSTGRES_DB: str = settings.POSTGRES_DB
+    POSTGRES_PORT: str = settings.POSTGRES_PORT
     return f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_SERVER}:{POSTGRES_PORT}/{POSTGRES_DB}"
 
 def run_migrations_offline() -> None:

@@ -3,9 +3,9 @@ from fastapi.encoders import jsonable_encoder
 from typing import Optional
 
 
-from app.core.config import settings
-from app.schemas.poducts import ProductSchema
-from app.models.products import ProductModel
+from core.config import settings
+from schemas.poducts import Product as ProductSchema
+from models.products import Product as ProductModel
 
 
 class CRUDProducts():
@@ -13,7 +13,8 @@ class CRUDProducts():
         self.connected = False
         self.conn = None
         self.cursor = None
-        self.headers = ["id","date","time","zone","currency","importance","event","actual","forecast","previous","timezone"]
+        self.headers = ["key","code","codebar","codebarInner","codebarMaster","unit","description",
+        "brand","buy","retailsale","wholesale","inventory","min_inventory","department","id","LastUpdate",]
 
     def OpenConnection(self):
         self.conn = psycopg2.connect(database=settings.POSTGRES_DB,
@@ -29,19 +30,20 @@ class CRUDProducts():
         db_obj = [v for x,v in obj_in_data.items()]
         db_obj = tuple(db_obj)
         self.cursor.execute("""
-               INSERT INTO economiccalendar (id, date, time, zone, currency, importance, event, actual, forecast, previous, timezone) 
-               VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
+               INSERT INTO product (key,code,codebar,codebarInner,codebarMaster,unit,description,brand,buy,
+               retailsale,wholesale,inventory,min_inventory,department,id,LastUpdate) 
+               VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
                """,
                db_obj)
         self.conn.commit()
         return db_obj
 
-    def get_by_id(self, id: str) -> Optional[ProductModel]:
-        self.cursor.execute(f"SELECT * FROM economiccalendar WHERE id={id}")
+    def get_by_code(self, search: str) -> Optional[ProductSchema]:
+        self.cursor.execute(f"SELECT * FROM product WHERE codebar='{search}' OR codebarinner='{search}' OR codebarmaster='{search}'")
         obj_out = self.cursor.fetchone()
-        if obj_out:
+        if obj_out: 
             obj_out = {x:y for x,y in zip(self.headers, obj_out)}
-            obj_out = ProductModel(**obj_out)
+            obj_out = ProductSchema(**obj_out)
         return obj_out
 
     def update_acutal_by_id(self, id:str, actual:str) -> Optional[ProductModel]:
@@ -59,4 +61,4 @@ class CRUDProducts():
         self.cursor = None
         self.connected = False
 
-products = CRUDProducts()
+CRUDproductsObject = CRUDProducts()
