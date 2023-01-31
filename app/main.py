@@ -12,7 +12,7 @@ app.include_router(api_router, prefix=settings.API_STR)
 
 @app.on_event("startup")
 async def satrtUp():
-    db.addDataFromCSV()
+    # db.addDataFromCSV()
     pass
 
 
