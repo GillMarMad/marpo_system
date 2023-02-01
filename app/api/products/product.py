@@ -39,7 +39,7 @@ def searchProduct(search : str) -> Product:
 def searchPDF(code : str) -> Product:
     id = getIdFromCode(code=code)
     if id:
-        url = "https://www.truper.com/ficha_tecnica/views/ficha-print.php?id={id}"
+        url = f"https://www.truper.com/ficha_tecnica/views/ficha-print.php?id={id}"
     else:
         url = f"https://www.truper.com/ficha_merca/ficha-print.php?code={code.strip()}"
     return url
