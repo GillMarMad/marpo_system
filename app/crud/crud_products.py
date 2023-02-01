@@ -38,8 +38,17 @@ class CRUDProducts():
         self.conn.commit()
         return db_obj
 
-    def get_by_code(self, search: str) -> Optional[ProductSchema]:
+    def get_by_codebars(self, search: str) -> Optional[ProductSchema]:
         self.cursor.execute(f"SELECT * FROM product WHERE codebar='{search}' OR codebarinner='{search}' OR codebarmaster='{search}'")
+        obj_out = self.cursor.fetchone()
+        if obj_out: 
+            obj_out = {x:y for x,y in zip(self.headers, obj_out)}
+            obj_out = ProductSchema(**obj_out)
+        return obj_out
+    
+    
+    def get_product(self, search: str) -> Optional[ProductSchema]:
+        self.cursor.execute(f"SELECT * FROM product WHERE key='{search}' OR code='{search}' OR codebarinner='{search}' OR codebarmaster='{search}' OR description LIKE '{search}' OR department='{search}'")
         obj_out = self.cursor.fetchone()
         if obj_out: 
             obj_out = {x:y for x,y in zip(self.headers, obj_out)}
