@@ -48,7 +48,7 @@ class CRUDProducts():
     
     
     def get_product(self, search: str) -> Optional[ProductSchema]:
-        self.cursor.execute(f"SELECT * FROM product WHERE key='{search}' OR code='{search}' OR codebarinner='{search}' OR codebarmaster='{search}' OR description LIKE '{search}' OR department='{search}'")
+        self.cursor.execute(f"SELECT * FROM product WHERE key='{search}' OR codebarinner='{search}' OR codebarmaster='{search}' OR description LIKE '{search}' OR department='{search}'")
         obj_out = self.cursor.fetchone()
         if obj_out: 
             obj_out = {x:y for x,y in zip(self.headers, obj_out)}
