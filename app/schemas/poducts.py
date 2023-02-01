@@ -4,7 +4,7 @@ from datetime import datetime
 
 class Product(BaseModel):
     key: str
-    code: int
+    code: str
     codebar: str
     codebarInner: str
     codebarMaster: str

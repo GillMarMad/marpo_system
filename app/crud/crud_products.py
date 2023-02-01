@@ -47,13 +47,16 @@ class CRUDProducts():
         return obj_out
     
     
-    def get_product(self, search: str) -> Optional[ProductSchema]:
-        self.cursor.execute(f"SELECT * FROM product WHERE key='{search}' OR codebarinner='{search}' OR codebarmaster='{search}' OR description LIKE '{search}' OR department='{search}'")
-        obj_out = self.cursor.fetchone()
-        if obj_out: 
-            obj_out = {x:y for x,y in zip(self.headers, obj_out)}
-            obj_out = ProductSchema(**obj_out)
-        return obj_out
+    def get_product(self, search: str) -> list[ProductSchema]:
+        self.cursor.execute(f"SELECT * FROM product WHERE code='{search}' OR key='{search}' OR description ILIKE '%{search}%'")
+        obj_out = self.cursor.fetchall()
+        products = []
+        if obj_out:
+            for product in obj_out:
+                p = {x:y for x,y in zip(self.headers, product)}
+                p = ProductSchema(**p)
+                products.append(p)
+        return products
 
     def update_acutal_by_id(self, id:str, actual:str) -> Optional[ProductModel]:
         self.cursor.execute(f"""

@@ -11,7 +11,7 @@ app = FastAPI(title=settings.PROJECT_NAME, openapi_url=f"{settings.API_STR}/open
 app.include_router(api_router, prefix=settings.API_STR)
 
 @app.on_event("startup")
-async def satrtUp():
+async def startUp():
     # db.addDataFromCSV()
     pass
 

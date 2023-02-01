@@ -5,7 +5,7 @@ from datetime import datetime
 class Product(Base):
     key = Column(String, primary_key=True,
                 index=True, nullable=False)
-    code = Column(Integer, unique=True, nullable=True)
+    code = Column(String, unique=True, nullable=True)
     codebar = Column(String, unique=True, nullable=True)
     codebarinner = Column(String, unique=True, nullable=True)
     codebarmaster = Column(String, unique=True, nullable=True)
