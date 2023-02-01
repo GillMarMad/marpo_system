@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from schemas.poducts import Product
 from crud.crud_products import CRUDproductsObject
-from onlineShearch import getIdFromCode
+from api.products.onlineShearch import getIdFromCode
 from datetime import datetime
 router = APIRouter()
 
