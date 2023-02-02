@@ -25,7 +25,7 @@ def getProduct(search : str) -> Product:
         return empty
 
 
-@router.post("/searchProduct", response_model=list[Product])
+@router.get("/searchProduct", response_model=list[Product])
 def searchProduct(search : str) -> Product:
     CRUDproductsObject.OpenConnection()
     result = CRUDproductsObject.get_product(search)
