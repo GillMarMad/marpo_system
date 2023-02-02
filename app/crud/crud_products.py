@@ -64,7 +64,7 @@ class CRUDProducts():
         """
         self.cursor.execute(query=query)
         products = []
-        if self.cursor:
+        if self.cursor and self.cursor.rowcount > 0:
             obj_out = self.cursor.fetchall()
             if obj_out:
                 for product in obj_out:
