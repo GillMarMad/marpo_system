@@ -54,8 +54,10 @@ class CRUDProducts():
         WHERE code='{search}' OR key=UPPER('{search}') OR key=LOWER('{search}') OR description ILIKE '%{search}%'
         ORDER BY
             CASE
-                WHEN description ~* '\m{search}\M' THEN 0
-                ELSE 1
+                WHEN description ILIKE '{search}%' THEN 0
+                WHEN description ILIKE '%{search}' THEN 1
+                WHEN description ILIKE '%{search}%' THEN 2
+                ELSE 3
             END,
             similarity(description, '{search}') DESC;
         """
