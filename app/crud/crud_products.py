@@ -49,17 +49,18 @@ class CRUDProducts():
     
     def get_product(self, search: str) -> list[ProductSchema]:
         query = f"""
+        CREATE EXTENSION IF NOT EXISTS unaccent;
         SELECT *
         FROM product
-        WHERE code='{search}' OR key=UPPER('{search}') OR key=LOWER('{search}') OR description ILIKE '%{search}%'
+        WHERE code='{search}' OR key=UPPER('{search}') OR key=LOWER('{search}') OR unaccent(description) ILIKE unaccent('%{search}%')
         ORDER BY
             CASE
-                WHEN description ILIKE '{search}%' THEN 0
-                WHEN description ILIKE '%{search}' THEN 1
-                WHEN description ILIKE '%{search}%' THEN 2
+                WHEN unaccent(description) ILIKE unaccent('{search}%')THEN 0
+                WHEN unaccent(description) ILIKE unaccent('%{search}')THEN 1
+                WHEN unaccent(description) ILIKE unaccent('%{search}%') THEN 2
                 ELSE 3
             END,
-            similarity(description, '{search}') DESC;
+            similarity(description, unaccent('{search}')) DESC;
         """
         self.cursor.execute(query=query)
         # self.cursor.execute(f"SELECT * FROM product WHERE code='{search}' OR key=UPPER('{search}') OR key=LOWER('{search}') OR description ILIKE '%{search}%' ORDER BY CASE WHEN description ~* '\m{search}\M' THEN 0 ELSE 1 END, similarity(description, '{search}') DESC")
