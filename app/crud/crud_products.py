@@ -48,7 +48,19 @@ class CRUDProducts():
     
     
     def get_product(self, search: str) -> list[ProductSchema]:
-        self.cursor.execute(f"SELECT * FROM product WHERE code='{search}' OR key=UPPER('{search}') OR key=LOWER('{search}') OR (description ILIKE '%{search}%' AND description ~* '\m{search}\M')")
+        query = f"""
+        SELECT *
+        FROM product
+        WHERE code='{search}' OR key=UPPER('{search}') OR key=LOWER('{search}') OR description ILIKE '%{search}%'
+        ORDER BY
+            CASE
+                WHEN description ~* '\m{search}\M' THEN 0
+                ELSE 1
+            END,
+            similarity(description, '{search}') DESC;
+        """
+        self.cursor.execute(query=query)
+        # self.cursor.execute(f"SELECT * FROM product WHERE code='{search}' OR key=UPPER('{search}') OR key=LOWER('{search}') OR description ILIKE '%{search}%' ORDER BY CASE WHEN description ~* '\m{search}\M' THEN 0 ELSE 1 END, similarity(description, '{search}') DESC")
         obj_out = self.cursor.fetchall()
         products = []
         if obj_out:
