@@ -63,14 +63,14 @@ class CRUDProducts():
             similarity(description, unaccent('{search}')) DESC;
         """
         self.cursor.execute(query=query)
-        # self.cursor.execute(f"SELECT * FROM product WHERE code='{search}' OR key=UPPER('{search}') OR key=LOWER('{search}') OR description ILIKE '%{search}%' ORDER BY CASE WHEN description ~* '\m{search}\M' THEN 0 ELSE 1 END, similarity(description, '{search}') DESC")
-        obj_out = self.cursor.fetchall()
         products = []
-        if obj_out:
-            for product in obj_out:
-                p = {x:y for x,y in zip(self.headers, product)}
-                p = ProductSchema(**p)
-                products.append(p)
+        if self.cursor:
+            obj_out = self.cursor.fetchall()
+            if obj_out:
+                for product in obj_out:
+                    p = {x:y for x,y in zip(self.headers, product)}
+                    p = ProductSchema(**p)
+                    products.append(p)
         return products
 
     def update_acutal_by_id(self, id:str, actual:str) -> Optional[ProductModel]:
