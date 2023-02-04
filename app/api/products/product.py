@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Response
 from schemas.poducts import Product
 from crud.crud_products import CRUDproductsObject
 from api.products.onlineShearch import getIdFromCode
@@ -43,3 +43,21 @@ def searchPDF(code : str) -> Product:
     else:
         url = f"https://www.truper.com/ficha_merca/ficha-print.php?code={code.strip()}"
     return url
+
+
+@router.get("/image/{image_name}")
+async def download_image(image_name: str, response: Response):
+    try:
+        with open(f"assets/img/{image_name}", "rb") as f:
+            image = f.read()
+    except FileNotFoundError:
+        with open(f"assets/img/no-image.jpg", "rb") as f:
+            image = f.read()
+    response.body = image
+    response.headers["Content-Type"] = "image/jpeg"
+    response.status_code = 200
+    return response
+
+
+
+    
