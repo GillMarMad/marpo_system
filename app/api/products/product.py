@@ -46,15 +46,30 @@ def searchPDF(code : str) -> Product:
 
 
 @router.get("/image/{image_name}")
-async def download_image(image_name: str, response: Response):
+async def download_product_image(image_name: str, response: Response):
     try:
-        with open(f"assets/img/{image_name}", "rb") as f:
+        with open(f"assets/img/{image_name}.jpg", "rb") as f:
             image = f.read()
     except FileNotFoundError:
         with open(f"assets/img/no-image.jpg", "rb") as f:
             image = f.read()
     response.body = image
     response.headers["Content-Type"] = "image/jpeg"
+    response.status_code = 200
+    return response
+
+
+@router.get("/image/brand/{image_name}")
+async def download_brand_image(image_name: str, response: Response):
+    try:
+        with open(f"assets/brands/{image_name}.png", "rb") as f:
+            image = f.read()
+        response.headers["Content-Type"] = "image/png"
+    except FileNotFoundError:
+        with open(f"assets/img/no-image.jpg", "rb") as f:
+            image = f.read()
+        response.headers["Content-Type"] = "image/jpeg"
+    response.body = image
     response.status_code = 200
     return response
 
