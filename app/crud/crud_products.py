@@ -78,7 +78,7 @@ class CRUDProducts():
         SELECT *
         FROM product
         ORDER BY LastUpdate DESC
-        LIMIT 10;
+        LIMIT 50;
         """
         self.cursor.execute(query=query)
         products = []
