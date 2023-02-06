@@ -14,7 +14,7 @@ class CRUDProducts():
         self.conn = None
         self.cursor = None
         self.headers = ["key","code","codebar","codebarInner","codebarMaster","unit","description",
-        "brand","buy","retailsale","wholesale","inventory","min_inventory","department","id","LastUpdate",]
+        "brand","buy","retailsale","wholesale","inventory","min_inventory","department","id","box","master","lastUpdate",]
 
     def OpenConnection(self):
         self.conn = psycopg2.connect(database=settings.POSTGRES_DB,
@@ -72,7 +72,26 @@ class CRUDProducts():
                     p = ProductSchema(**p)
                     products.append(p)
         return products
+    
+    def get_lastest_products(self) -> list[ProductSchema]:
+        query = f"""
+        SELECT *
+        FROM product
+        ORDER BY LastUpdate DESC
+        LIMIT 10;
+        """
+        self.cursor.execute(query=query)
+        products = []
+        if self.cursor and self.cursor.rowcount > 0:
+            obj_out = self.cursor.fetchall()
+            if obj_out:
+                for product in obj_out:
+                    p = {x:y for x,y in zip(self.headers, product)}
+                    p = ProductSchema(**p)
+                    products.append(p)
+        return products
 
+    
     def update_acutal_by_id(self, id:str, actual:str) -> Optional[ProductModel]:
         self.cursor.execute(f"""
                UPDATE economiccalendar 

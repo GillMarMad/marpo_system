@@ -19,4 +19,6 @@ class Product(Base):
     min_inventory = Column(Integer, nullable=True)
     department = Column(String, nullable=True)
     id = Column(Integer, unique=False, nullable=True)
-    LastUpdate = Column(DateTime, default=datetime.now())
+    box = Column(Integer, default=0)
+    master = Column(Integer, default=0)
+    lastupdate = Column(DateTime, default=datetime.now())

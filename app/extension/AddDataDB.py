@@ -56,12 +56,10 @@ def addDataFromCSV():
                     row[i] = int(row[i])
                 else:
                     row[i]=0
-
-        
         row.append(datetime.now())
         values.append(tuple(row))
 
-    args = ','.join(cursor.mogrify("(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)", j).decode('utf-8')
+    args = ','.join(cursor.mogrify("(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)", j).decode('utf-8')
                     for j in values)
 
     cursor.execute("INSERT INTO product VALUES " + (args))

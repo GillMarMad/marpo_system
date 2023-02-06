@@ -21,7 +21,7 @@ def getProduct(search : str) -> Product:
     if result:
         return result
     else:
-        empty = Product(key="None", code=0, codebar="", codebarInner="", codebarMaster="", unit="", description="", brand="", buy=0,retailsale=0,wholesale=0,inventory=0, min_inventory=0,department="",id=0,LastUpdate=datetime.now())
+        empty = Product(key="None", code=0, codebar="", codebarInner="", codebarMaster="", unit="", description="", brand="", buy=0,retailsale=0,wholesale=0,inventory=0, min_inventory=0,department="",id=0,lastupdate=datetime.now())
         return empty
 
 
@@ -43,6 +43,16 @@ def searchPDF(code : str) -> Product:
     else:
         url = f'https://www.truper.com/ficha_merca/ficha-print.php?code={code.strip()}'
     return url
+
+@router.get("/lastUpdatedProducts", response_model=list[Product])
+def lastestProducts() -> Product:
+    CRUDproductsObject.OpenConnection()
+    result = CRUDproductsObject.get_lastest_products()
+    CRUDproductsObject.CloseConnection()
+    if result:
+        return result
+    else:
+        return []
 
 
 @router.get("/image/{image_name}")
