@@ -21,7 +21,7 @@ def getProduct(search : str) -> Product:
     if result:
         return result
     else:
-        empty = Product(key="None", code=0, codebar="", codebarInner="", codebarMaster="", unit="", description="", brand="", buy=0,retailsale=0,wholesale=0,inventory=0, min_inventory=0,department="",id=0,lastupdate=datetime.now())
+        empty = Product(key="None", code=0, codebar="", codebarInner="", codebarMaster="", unit="", description="", brand="", buy=0,retailsale=0,wholesale=0,inventory=0, min_inventory=0,department="",id=0,box=0,master=0,lastUpdate=datetime.now())
         return empty
 
 
