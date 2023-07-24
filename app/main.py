@@ -1,6 +1,7 @@
 import uvicorn
 from fastapi import FastAPI
 import extension.AddDataDB as db
+import extension.AddFromPuntodeVenta as dbpv
 
 from core.config import settings
 from api.api import api_router
@@ -13,6 +14,7 @@ app.include_router(api_router, prefix=settings.API_STR)
 @app.on_event("startup")
 async def startUp():
     # db.addDataFromCSV()
+    # dbpv.addData()
     pass
 
 

@@ -61,7 +61,7 @@ async def download_product_image(image_name: str, response: Response):
         with open(f"assets/img/{image_name}.jpg", "rb") as f:
             image = f.read()
     except FileNotFoundError:
-        with open(f"assets/img/no-image.jpg", "rb") as f:
+        with open(f"assets/img/shopping-cart.png", "rb") as f:
             image = f.read()
     response.body = image
     response.headers["Content-Type"] = "image/jpeg"

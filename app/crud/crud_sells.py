@@ -1,3 +1,4 @@
+from datetime import datetime
 import psycopg2
 from fastapi.encoders import jsonable_encoder
 from typing import Optional
@@ -8,12 +9,13 @@ from schemas.poducts import Product as ProductSchema
 from models.products import Product as ProductModel
 
 
-class CRUDProducts():
+class CRUDSells():
     def __init__(self):
         self.connected = False
         self.conn = None
         self.cursor = None
-        self.headers = ["key","code","codebar","codebarInner","codebarMaster","unit","description",
+        self.headers_sell = ["id_compra","id_producto","cantidad","date",]
+        self.headers_product = ["key","code","codebar","codebarInner","codebarMaster","unit","description",
         "brand","buy","retailsale","wholesale","inventory","min_inventory","department","id","box","master","lastUpdate",]
 
     def OpenConnection(self):
@@ -25,19 +27,53 @@ class CRUDProducts():
         self.cursor = self.conn.cursor()
         self.connected = True
 
-    def create_product(self, obj_in: ProductSchema):
-        obj_in_data = jsonable_encoder(obj_in)
-        db_obj = [v for x,v in obj_in_data.items()]
-        db_obj = tuple(db_obj)
-        self.cursor.execute("""
-               INSERT INTO product (key,code,codebar,codebarInner,codebarMaster,unit,description,brand,buy,
-               retailsale,wholesale,inventory,min_inventory,department,id,box,master,LastUpdate) 
-               VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
-               """,
-               db_obj)
-        self.conn.commit()
-        return db_obj
+    def create_sell(self, products_key: dict[str]):
+        try:
+            products = {'SUD-GD-G':{'retail':True, 'amount':1},'SOT-250CL':{'retail':True, 'amount':1},'SOMU-250X':{'retail':True, 'amount':1},'SET-73':{'retail':True, 'amount':1},'ROTO-1/2N6':{'retail':True, 'amount':1}}
+            prices = {}
+            for p in products.keys:
+                self.cursor.execute(f"SELECT * FROM product WHERE key='{p}'")
+                obj_out = self.cursor.fetchone()
+                if obj_out: 
+                    obj_out = {x:y for x,y in zip(self.headers, obj_out)}
+                    obj_out = ProductSchema(**obj_out)
+                prices[p] = {'amount':products[p]['amount'],
+                             'sell_price': obj_out.retailsale if products[p]['retail'] else obj_out.wholesale,
+                             'buy_price' : obj_out.buy,
+                             }
+            consulta = "INSERT INTO sells (id_sell,id_product, amount, sell_price,buy_price,total,date) VALUES "
+            id_generated = int(datetime.now().timestamp())
+            print(id_generated)
+            valores = ", ".join([f"('{id_generated}','{p}', '{prices[p]['amount']}', '{prices[p]['sell_price']}', '{prices[p]['buy_price']}','{prices[p]['amount']*prices[p]['sell_price']}','{datetime.now()}')" for p in prices.keys()])
+            consulta += valores + ";"
+            self.cursor.execute(consulta)
+            self.conn.commit()
+            return {"mensaje": "Sell send succesfully", "status_code": 200}
+        except:
+             return {"mensaje": "Error", "status_code": 404}
 
+    def get_sell(self, id_sell: int) -> list[ProductSchema]:
+        consulta = f"""
+        SELECT p.*
+        FROM product p
+        JOIN sells c ON p.key = c.id_producto
+        WHERE c.id_compra = {id_sell};
+        """
+        self.cursor.execute(consulta)
+        products = []
+        if self.cursor and self.cursor.rowcount > 0:
+            obj_out = self.cursor.fetchall()
+            if obj_out:
+                for product in obj_out:
+                    p = {x:y for x,y in zip(self.headers_product, product)}
+                    p = ProductSchema(**p)
+                    products.append(p)
+        return products
+    
+    
+    
+    
+    
     def get_by_codebars(self, search: str) -> Optional[ProductSchema]:
         self.cursor.execute(f"SELECT * FROM product WHERE codebar='{search}' OR codebarinner='{search}' OR codebarmaster='{search}'")
         obj_out = self.cursor.fetchone()
@@ -121,4 +157,4 @@ class CRUDProducts():
         self.cursor = None
         self.connected = False
 
-CRUDproductsObject = CRUDProducts()
+CRUDsellsObject = CRUDSells()

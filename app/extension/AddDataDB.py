@@ -17,7 +17,7 @@ def addDataFromCSV():
     conn = db.conn
     cursor = db.cursor
 
-    cursor.execute("DELETE FROM product *")
+    # cursor.execute("DELETE FROM product *")
     conn.commit()
 
     file_path = "assets\data\catalogo_utf8.csv"
