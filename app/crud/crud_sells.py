@@ -28,29 +28,27 @@ class CRUDSells():
         self.connected = True
 
     def create_sell(self, products_key: dict[str]):
-        try:
-            products = {'SUD-GD-G':{'retail':True, 'amount':1},'SOT-250CL':{'retail':True, 'amount':1},'SOMU-250X':{'retail':True, 'amount':1},'SET-73':{'retail':True, 'amount':1},'ROTO-1/2N6':{'retail':True, 'amount':1}}
-            prices = {}
-            for p in products.keys:
-                self.cursor.execute(f"SELECT * FROM product WHERE key='{p}'")
-                obj_out = self.cursor.fetchone()
-                if obj_out: 
-                    obj_out = {x:y for x,y in zip(self.headers, obj_out)}
-                    obj_out = ProductSchema(**obj_out)
-                prices[p] = {'amount':products[p]['amount'],
-                             'sell_price': obj_out.retailsale if products[p]['retail'] else obj_out.wholesale,
-                             'buy_price' : obj_out.buy,
-                             }
-            consulta = "INSERT INTO sells (id_sell,id_product, amount, sell_price,buy_price,total,date) VALUES "
-            id_generated = int(datetime.now().timestamp())
-            print(id_generated)
-            valores = ", ".join([f"('{id_generated}','{p}', '{prices[p]['amount']}', '{prices[p]['sell_price']}', '{prices[p]['buy_price']}','{prices[p]['amount']*prices[p]['sell_price']}','{datetime.now()}')" for p in prices.keys()])
-            consulta += valores + ";"
-            self.cursor.execute(consulta)
-            self.conn.commit()
-            return {"mensaje": "Sell send succesfully", "status_code": 200}
-        except:
-             return {"mensaje": "Error", "status_code": 404}
+        products = {'SUD-GD-G':{'retail':True, 'amount':1},'SOT-250CL':{'retail':True, 'amount':1},'SOMU-250X':{'retail':True, 'amount':1},'SET-73':{'retail':True, 'amount':1},'ROTO-1/2N6':{'retail':True, 'amount':1}}
+        prices = {}
+        for p in products.keys():
+            self.cursor.execute(f"SELECT * FROM product WHERE key='{p}'")
+            obj_out = self.cursor.fetchone()
+            if obj_out: 
+                obj_out = {x:y for x,y in zip(self.headers_product, obj_out)}
+                obj_out = ProductSchema(**obj_out)
+            prices[p] = {'amount':products[p]['amount'],
+                            'sell_price': obj_out.retailsale if products[p]['retail'] else obj_out.wholesale,
+                            'buy_price' : obj_out.buy,
+                            }
+        consulta = "INSERT INTO sells (id_sell,id_product, amount, sell_price,buy_price,total,date) VALUES "
+        id_generated = int(datetime.now().timestamp())
+        print(id_generated)
+        valores = ", ".join([f"('{id_generated}','{p}', '{prices[p]['amount']}', '{prices[p]['sell_price']}', '{prices[p]['buy_price']}','{prices[p]['amount']*prices[p]['sell_price']}','{datetime.now()}')" for p in prices.keys()])
+        consulta += valores + ";"
+        self.cursor.execute(consulta)
+        self.conn.commit()
+        return {"mensaje": "Sell send succesfully", "status_code": 200}
+            #  return {"mensaje": "Error", "status_code": 404}
 
     def get_sell(self, id_sell: int) -> list[ProductSchema]:
         consulta = f"""
