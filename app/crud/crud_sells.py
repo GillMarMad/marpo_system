@@ -6,7 +6,9 @@ from typing import Optional
 
 from core.config import settings
 from schemas.poducts import Product as ProductSchema
-from models.products import Product as ProductModel
+from schemas.sells import Sell as SellSchema
+# from models.products import Product as ProductModel
+# from models.sells import Sells as SellModel
 
 
 class CRUDSells():
@@ -14,7 +16,7 @@ class CRUDSells():
         self.connected = False
         self.conn = None
         self.cursor = None
-        self.headers_sell = ["id_compra","id_producto","cantidad","date",]
+        self.headers_sell = ["id","id_sell","id_product","amount","sell_price","buy_price","total","date",]
         self.headers_product = ["key","code","codebar","codebarInner","codebarMaster","unit","description",
         "brand","buy","retailsale","wholesale","inventory","min_inventory","department","id","box","master","lastUpdate",]
 
@@ -50,102 +52,34 @@ class CRUDSells():
         return {"mensaje": "Sell send succesfully", "status_code": 200}
             #  return {"mensaje": "Error", "status_code": 404}
 
-    def get_sell(self, id_sell: int) -> list[ProductSchema]:
-        consulta = f"""
-        SELECT p.*
-        FROM product p
-        JOIN sells c ON p.key = c.id_producto
-        WHERE c.id_compra = {id_sell};
-        """
-        self.cursor.execute(consulta)
-        products = []
+    def get_sell(self, id_sell: int) -> list[SellSchema]:
+        self.cursor.execute(f"SELECT * FROM sells WHERE id_sell='{id_sell}'")
+        sells = []
         if self.cursor and self.cursor.rowcount > 0:
             obj_out = self.cursor.fetchall()
             if obj_out:
                 for product in obj_out:
-                    p = {x:y for x,y in zip(self.headers_product, product)}
-                    p = ProductSchema(**p)
-                    products.append(p)
-        return products
-    
-    
-    
-    
-    
-    def get_by_codebars(self, search: str) -> Optional[ProductSchema]:
-        self.cursor.execute(f"SELECT * FROM product WHERE codebar='{search}' OR codebarinner='{search}' OR codebarmaster='{search}'")
-        obj_out = self.cursor.fetchone()
-        if obj_out: 
-            obj_out = {x:y for x,y in zip(self.headers, obj_out)}
-            obj_out = ProductSchema(**obj_out)
-        return obj_out
-    
-    def get_by_codebar(self, search: str) -> Optional[ProductSchema]:
-        self.cursor.execute(f"SELECT * FROM product WHERE codebar='{search}'")
-        obj_out = self.cursor.fetchone()
-        if obj_out: 
-            obj_out = {x:y for x,y in zip(self.headers, obj_out)}
-            obj_out = ProductSchema(**obj_out)
-        return obj_out
-    
-    
-    def get_product(self, search: str) -> list[ProductSchema]:
-        query = f"""
-        CREATE EXTENSION IF NOT EXISTS unaccent;
-        SELECT *
-        FROM product
-        WHERE code='{search}' OR key=UPPER('{search}') OR key=LOWER('{search}') OR unaccent(description) ILIKE unaccent('%{search}%')
-        ORDER BY
-            CASE
-                WHEN unaccent(description) ILIKE unaccent('{search}%')THEN 0
-                WHEN unaccent(description) ILIKE unaccent('%{search}')THEN 1
-                WHEN unaccent(description) ILIKE unaccent('%{search}%') THEN 2
-                ELSE 3
-            END,
-            similarity(description, unaccent('{search}')) DESC;
-        """
-        self.cursor.execute(query=query)
-        products = []
-        if self.cursor and self.cursor.rowcount > 0:
-            obj_out = self.cursor.fetchall()
-            if obj_out:
-                for product in obj_out:
-                    p = {x:y for x,y in zip(self.headers, product)}
-                    p = ProductSchema(**p)
-                    products.append(p)
-        return products
-    
-    def get_lastest_products(self) -> list[ProductSchema]:
-        query = f"""
-        SELECT *
-        FROM product
-        ORDER BY LastUpdate DESC
-        LIMIT 50;
-        """
-        self.cursor.execute(query=query)
-        products = []
-        if self.cursor and self.cursor.rowcount > 0:
-            obj_out = self.cursor.fetchall()
-            if obj_out:
-                for product in obj_out:
-                    p = {x:y for x,y in zip(self.headers, product)}
-                    p = ProductSchema(**p)
-                    products.append(p)
-        return products
+                    p = {x:y for x,y in zip(self.headers_sell, product)}
+                    p = SellSchema(**p)
+                    sells.append(p)
+        return sells
 
-    
-    def update_product(self, codebar:str, obj_in:ProductSchema) -> Optional[ProductModel]:
-        x = f"""
-               UPDATE product
-               SET key='{obj_in.key}',code={obj_in.code},codebarInner={obj_in.codebarInner},codebarMaster={obj_in.codebarMaster},unit='{obj_in.unit}',brand='{obj_in.brand}',buy={obj_in.buy},
-               retailsale={obj_in.retailsale},wholesale={obj_in.wholesale},inventory={obj_in.inventory},min_inventory={obj_in.min_inventory}
-               WHERE codebar='{codebar}';
-               """
-        try:
-            self.cursor.execute(x)
-        except:
-            print(x)
-        self.conn.commit()
+        # consulta= f"""
+        # SELECT p.*
+        # FROM product p
+        # JOIN sells c ON p.key = c.id_producto
+        # WHERE c.id_compra = {id_sell};
+        # """
+        # self.cursor.execute(consulta)
+        # products = []
+        # if self.cursor and self.cursor.rowcount > 0:
+        #     obj_out = self.cursor.fetchall()
+        #     if obj_out:
+        #         for product in obj_out:
+        #             p = {x:y for x,y in zip(self.headers_product, product)}
+        #             p = ProductSchema(**p)
+        #             products.append(p)
+        # return products
     
     def CloseConnection(self):
         self.conn.rollback()
