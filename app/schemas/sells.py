@@ -10,3 +10,9 @@ class Sell(BaseModel):
     buy_price: float
     total: float
     date: datetime
+
+
+class SellProduct(BaseModel):
+    key : str
+    retail : bool
+    amount : int
