@@ -3,6 +3,7 @@ from datetime import datetime
 
 
 class Product(BaseModel):
+    id: int
     key: str
     code: str
     codebar: str
@@ -17,7 +18,7 @@ class Product(BaseModel):
     inventory: int
     min_inventory: int
     department: str
-    id: int
     box: int
     master: int
     lastUpdate: datetime
+    sell_id: int

@@ -1,10 +1,13 @@
 from db.base_class import Base
-from sqlalchemy import Boolean, Column, String, DateTime,Integer, Float
+from sqlalchemy import Boolean, Column, String, DateTime,Integer, Float, ForeignKey
+from sqlalchemy.orm import relationship
+from models.sale import sales_products
 from datetime import datetime
 
 class Product(Base):
-    key = Column(String, primary_key=True,
-                index=True, nullable=False)
+    __tablename__ = "products"
+    id = Column(Integer, unique=False, nullable=False, autoincrement=True, primary_key=True, index=True)
+    key = Column(String, index=True, nullable=False)
     code = Column(String, unique=True, nullable=True)
     codebar = Column(String, unique=True, nullable=True)
     codebarinner = Column(String, unique=True, nullable=True)
@@ -18,7 +21,8 @@ class Product(Base):
     inventory = Column(Integer, nullable=True)
     min_inventory = Column(Integer, nullable=True)
     department = Column(String, nullable=True)
-    id = Column(Integer, unique=False, nullable=True)
+    origin_id = Column(Integer, nullable=True)
     box = Column(Integer, default=0)
     master = Column(Integer, default=0)
     lastupdate = Column(DateTime, default=datetime.now())
+    sales = relationship('Sale', secondary=sales_products, back_populates='products')

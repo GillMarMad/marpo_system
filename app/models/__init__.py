@@ -1,2 +1,2 @@
-from .products import Product
-from .sells import Sells
+from models.products import Product
+from models.sale import Sale

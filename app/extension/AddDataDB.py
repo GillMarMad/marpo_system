@@ -18,7 +18,7 @@ def addDataFromCSV():
     cursor = db.cursor
 
     # cursor.execute("DELETE FROM product *")
-    conn.commit()
+    # conn.commit()
 
     file_path = "assets\data\catalogo_utf8.csv"
     data = pd.read_csv(file_path, encoding='utf-8')
@@ -58,13 +58,28 @@ def addDataFromCSV():
                     row[i]=0
         row.append(datetime.now())
         values.append(tuple(row))
+        #add a int value in the begining of the tuple
+        values[j] = (j,) + values[j]
 
-    args = ','.join(cursor.mogrify("(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)", j).decode('utf-8')
+    args = ','.join(cursor.mogrify("(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)", j).decode('utf-8')
                     for j in values)
 
-    cursor.execute("INSERT INTO product VALUES " + (args))
+    cursor.execute("INSERT INTO products VALUES " + (args))
 
     conn.commit()
 
     print(f"----- Uploading Data to DB Finished ----- {time.time() - start_time} s")
+    db.CloseConnection()
+
+
+def dummy_example_addProduct():
+    db = CRUDproductsObject
+
+    db.OpenConnection()
+
+    conn = db.conn
+    cursor = db.cursor
+
+    cursor.execute("INSERT INTO products (key, code, codebar, codebarInner, codebarMaster, unit, description, brand, buy, retailsale, wholesale, inventory, min_inventory, department, id, box, master, LastUpdate) VALUES('1', '1', '1', '1', '1', '1', '1', '1', 1, 1, 1, 1, 1, 1, 1, 1, 1, '2023-01-01 00:00:00');")
+    conn.commit()
     db.CloseConnection()

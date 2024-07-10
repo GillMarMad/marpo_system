@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Response
-from schemas.sells import Sell, SellProduct
+from schemas.sale import Sale
 from crud.crud_sells import CRUDsellsObject
 from api.products.onlineShearch import getIdFromCode
 from datetime import datetime
@@ -13,17 +13,17 @@ router = APIRouter()
 #     return result
 
 
-@router.post("/postSell", response_model=dict)
-def SetSell(products : list[SellProduct]) -> dict:
-    CRUDsellsObject.OpenConnection()
-    result = CRUDsellsObject.create_sell(products=products)
-    CRUDsellsObject.CloseConnection()
-    return result
+# @router.post("/postSell", response_model=dict)
+# def SetSell(products : list[SellProduct]) -> dict:
+#     CRUDsellsObject.OpenConnection()
+#     result = CRUDsellsObject.create_sell(products=products)
+#     CRUDsellsObject.CloseConnection()
+#     return result
 
 
 
-@router.post("/getSell", response_model=list[Sell])
-def getSell(id_sell : str) -> list[Sell]:
+@router.post("/getSell", response_model=list[Sale])
+def getSell(id_sell : str) -> list[Sale]:
     CRUDsellsObject.OpenConnection()
     result = CRUDsellsObject.get_sell(id_sell=id_sell)
     CRUDsellsObject.CloseConnection()
