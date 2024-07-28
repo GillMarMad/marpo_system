@@ -36,7 +36,7 @@ def searchProduct(search : str) -> Product:
         return []
 
 @router.get("/getPDF", response_model=str)
-def searchPDF(code : str) -> Product:
+def searchPDF(code : str) -> str:
     id = getIdFromCode(code=code)
     if id:
         url = f'https://www.truper.com/ficha_tecnica/views/ficha-print.php?id={id}'

@@ -33,23 +33,26 @@ def getAlternative(code):
 def getMain(code):
     url = "https://www.truper.com/restDataSheet2/api/products/searchDownloads.php"
     response = requests.post(url, headers={}, data={'word': code})
-    if(response.status_code==200):
-        data = json.loads(response.content)
-        if len(data) < 1:
-            return None
-        else:
-            data = data['data']
-        if len(data) > 1:
-            product = findInList(value=code,list = data)
-            if len(product) > 1:
-                id = product['id']
+    try:
+        if(response.status_code==200):
+            data = json.loads(response.content)
+            if len(data) < 1:
+                return None
+            else:
+                data = data['data']
+            if len(data) > 1:
+                product = findInList(value=code,list = data)
+                if len(product) > 1:
+                    id = product['id']
+                else:
+                    id = None
+            elif len(data) == 1:
+                id = data[0]['id']
             else:
                 id = None
-        elif len(data) == 1:
-            id = data[0]['id']
         else:
             id = None
-    else:
+    except Exception as e:
         id = None
     return id
 
