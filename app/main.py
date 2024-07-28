@@ -1,7 +1,7 @@
 import uvicorn
 from fastapi import FastAPI
 import extension.AddDataDB as db
-# import extension.AddFromPuntodeVenta as dbpv
+import extension.AddFromPuntodeVenta as dbpv
 
 from core.config import settings
 from api.api import api_router

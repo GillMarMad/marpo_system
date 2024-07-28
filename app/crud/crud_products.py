@@ -27,12 +27,14 @@ class CRUDProducts():
 
     def create_product(self, obj_in: ProductSchema):
         obj_in_data = jsonable_encoder(obj_in)
+        self.cursor.execute("SELECT MAX(id) FROM products")
+        obj_in_data["id"] = self.cursor.fetchone()[0] + 1
         db_obj = [v for x,v in obj_in_data.items()]
         db_obj = tuple(db_obj)
         self.cursor.execute("""
-               INSERT INTO products (key,code,codebar,codebarInner,codebarMaster,unit,description,brand,buy,
-               retailsale,wholesale,inventory,min_inventory,department,id,box,master,LastUpdate) 
-               VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
+               INSERT INTO products (id,key,code,codebar,codebarInner,codebarMaster,unit,description,brand,buy,
+               retailsale,wholesale,inventory,min_inventory,department,box,master,origin_id,LastUpdate) 
+               VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
                """,
                db_obj)
         self.conn.commit()
@@ -57,18 +59,30 @@ class CRUDProducts():
     
     def get_product(self, search: str) -> list[ProductSchema]:
         query = f"""
+        -- Crear extensión unaccent si no existe
         CREATE EXTENSION IF NOT EXISTS unaccent;
+
+        -- Consulta de búsqueda
+        WITH ranked_products AS (
+            SELECT *,
+                ts_rank_cd(to_tsvector('spanish', unaccent(description)), plainto_tsquery('spanish', unaccent('{search}'))) AS rank
+            FROM products
+            WHERE to_tsvector('spanish', unaccent(description)) @@ plainto_tsquery('spanish', unaccent('{search}'))
+                OR code = '{search}'
+                OR key = UPPER('{search}')
+                OR key = LOWER('{search}')
+        )
         SELECT *
-        FROM products
-        WHERE code='{search}' OR key=UPPER('{search}') OR key=LOWER('{search}') OR unaccent(description) ILIKE unaccent('%{search}%')
+        FROM ranked_products
         ORDER BY
+            rank DESC,
             CASE
-                WHEN unaccent(description) ILIKE unaccent('{search}%')THEN 0
-                WHEN unaccent(description) ILIKE unaccent('%{search}')THEN 1
-                WHEN unaccent(description) ILIKE unaccent('%{search}%') THEN 2
+                WHEN unaccent(description) ILIKE unaccent('{search}' || '%') THEN 0
+                WHEN unaccent(description) ILIKE unaccent('%' || '{search}') THEN 1
+                WHEN unaccent(description) ILIKE unaccent('%' || '{search}' || '%') THEN 2
                 ELSE 3
-            END,
-            similarity(description, unaccent('{search}')) DESC;
+            END;
+
         """
         self.cursor.execute(query=query)
         products = []
@@ -109,9 +123,11 @@ class CRUDProducts():
                """
         try:
             self.cursor.execute(x)
+            print(f"Product updated: {obj_in.code}")
         except:
             print(x)
         self.conn.commit()
+        print(f"Product updated: {obj_in.code}")
     
     def CloseConnection(self):
         self.conn.rollback()
