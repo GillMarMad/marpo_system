@@ -56,6 +56,34 @@ def getMain(code):
         id = None
     return id
 
+def getProductInfo(code) -> str:
+    pdf = None
+    try:
+        url = "https://www.truper.com/restDataSheet/api/search/products.php"
+
+        payload = {'word': code}
+        headers = {}
+
+        response = requests.request("POST", url, headers=headers, data=payload)
+
+        # parse response to the new url --> [{"code":18630,"sku":"ZP-7M","name":"Zapapico 7 lb, mango fibra de vidrio 36\", Truper","imgUrl":"https:\/\/www.truper.com\/admin\/images\/ch\/18630.jpg","url":"https:\/\/www.truper.com\/ficha_tecnica\/Zapapicos.html"}]
+        prodcutsResponse = json.loads(response.text)
+
+        newurl = prodcutsResponse[0]['url']
+
+        response = requests.request("GET", newurl)
+
+        soup = BeautifulSoup(response.text, 'html.parser')
+
+        #find div with id="dataSheetId"
+        input = soup.find(id="descargables_pdf")
+        pdf = input.find('a')['href']
+    except Exception as e:
+        pdf = None
+        
+    return pdf
+
+
 def getIdFromCode(code):
     id = getMain(code)
     if id:

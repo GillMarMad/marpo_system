@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Response
 from schemas.poducts import Product
 from crud.crud_products import CRUDproductsObject
-from api.products.onlineShearch import getIdFromCode
+from api.products.onlineShearch import getIdFromCode, getProductInfo
 from datetime import datetime
 router = APIRouter()
 
@@ -37,11 +37,15 @@ def searchProduct(search : str) -> Product:
 
 @router.get("/getPDF", response_model=str)
 def searchPDF(code : str) -> str:
-    id = getIdFromCode(code=code)
-    if id:
-        url = f'https://www.truper.com/ficha_tecnica/views/ficha-print.php?id={id}'
+    url = getProductInfo(code)
+    if url:
+        return url
     else:
-        url = f'https://www.truper.com/ficha_merca/ficha-print.php?code={code.strip()}'
+        id = getIdFromCode(code=code)
+        if id:
+            url = f'https://www.truper.com/ficha_tecnica/views/ficha-print.php?id={id}'
+        else:
+            url = f'https://www.truper.com/ficha_merca/ficha-print.php?code={code.strip()}'
     return url
 
 @router.get("/lastUpdatedProducts", response_model=list[Product])
