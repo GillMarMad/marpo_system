@@ -13,8 +13,8 @@ class CRUDProducts():
         self.connected = False
         self.conn = None
         self.cursor = None
-        self.headers = ["key","code","codebar","codebarInner","codebarMaster","unit","description",
-        "brand","buy","retailsale","wholesale","inventory","min_inventory","department","id","box","master","lastUpdate",]
+        self.headers = ["id","key","code","codebar","codebarInner","codebarMaster","unit","description",
+        "brand","buy","retailsale","wholesale","inventory","min_inventory","department","origin_id","box","master","lastUpdate",]
 
     def OpenConnection(self):
         self.conn = psycopg2.connect(database=settings.POSTGRES_DB,
@@ -30,7 +30,7 @@ class CRUDProducts():
         db_obj = [v for x,v in obj_in_data.items()]
         db_obj = tuple(db_obj)
         self.cursor.execute("""
-               INSERT INTO product (key,code,codebar,codebarInner,codebarMaster,unit,description,brand,buy,
+               INSERT INTO products (key,code,codebar,codebarInner,codebarMaster,unit,description,brand,buy,
                retailsale,wholesale,inventory,min_inventory,department,id,box,master,LastUpdate) 
                VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
                """,
@@ -39,7 +39,7 @@ class CRUDProducts():
         return db_obj
 
     def get_by_codebars(self, search: str) -> Optional[ProductSchema]:
-        self.cursor.execute(f"SELECT * FROM product WHERE codebar='{search}' OR codebarinner='{search}' OR codebarmaster='{search}'")
+        self.cursor.execute(f"SELECT * FROM products WHERE codebar='{search}' OR codebarinner='{search}' OR codebarmaster='{search}'")
         obj_out = self.cursor.fetchone()
         if obj_out: 
             obj_out = {x:y for x,y in zip(self.headers, obj_out)}
@@ -47,7 +47,7 @@ class CRUDProducts():
         return obj_out
     
     def get_by_codebar(self, search: str) -> Optional[ProductSchema]:
-        self.cursor.execute(f"SELECT * FROM product WHERE codebar='{search}'")
+        self.cursor.execute(f"SELECT * FROM products WHERE codebar='{search}'")
         obj_out = self.cursor.fetchone()
         if obj_out: 
             obj_out = {x:y for x,y in zip(self.headers, obj_out)}
@@ -59,7 +59,7 @@ class CRUDProducts():
         query = f"""
         CREATE EXTENSION IF NOT EXISTS unaccent;
         SELECT *
-        FROM product
+        FROM products
         WHERE code='{search}' OR key=UPPER('{search}') OR key=LOWER('{search}') OR unaccent(description) ILIKE unaccent('%{search}%')
         ORDER BY
             CASE
@@ -84,7 +84,7 @@ class CRUDProducts():
     def get_lastest_products(self) -> list[ProductSchema]:
         query = f"""
         SELECT *
-        FROM product
+        FROM products
         ORDER BY LastUpdate DESC
         LIMIT 50;
         """
@@ -102,7 +102,7 @@ class CRUDProducts():
     
     def update_product(self, codebar:str, obj_in:ProductSchema) -> Optional[ProductModel]:
         x = f"""
-               UPDATE product
+               UPDATE products
                SET key='{obj_in.key}',code={obj_in.code},codebarInner={obj_in.codebarInner},codebarMaster={obj_in.codebarMaster},unit='{obj_in.unit}',brand='{obj_in.brand}',buy={obj_in.buy},
                retailsale={obj_in.retailsale},wholesale={obj_in.wholesale},inventory={obj_in.inventory},min_inventory={obj_in.min_inventory}
                WHERE codebar='{codebar}';

@@ -18,7 +18,7 @@ class Product(BaseModel):
     inventory: int
     min_inventory: int
     department: str
+    origin_id: int
     box: int
     master: int
     lastUpdate: datetime
-    sell_id: int
