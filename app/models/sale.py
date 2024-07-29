@@ -1,5 +1,5 @@
 # from app.models.products import Product
-from app.db.base_class import Base
+from db.base_class import Base
 from sqlalchemy import Column, String, DateTime,Integer, Float, ForeignKey, Table
 from sqlalchemy.orm import relationship
 from datetime import datetime

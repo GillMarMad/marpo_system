@@ -39,7 +39,28 @@ class CRUDProducts():
                db_obj)
         self.conn.commit()
         return db_obj
+    
+    def get_product_by_id(self, id: int) -> Optional[ProductSchema]:
+        self.cursor.execute(f"SELECT * FROM products WHERE id={id}")
+        obj_out = self.cursor.fetchone()
+        if obj_out: 
+            obj_out = {x:y for x,y in zip(self.headers, obj_out)}
+            obj_out = ProductSchema(**obj_out)
+        return obj_out
+    
+    def upgdate_stock(self, id:int, quantity:float):
+        try:
+            self.cursor.execute(f"SELECT inventory FROM products WHERE id={id}")
+            inventory = self.cursor.fetchone()[0]
+            inventory += quantity
+            self.cursor.execute(f"UPDATE products SET inventory={inventory} WHERE id={id}")
+            self.conn.commit()
+            return True
+        except:
+            print("Error updating stock")
+            return None
 
+    
     def get_by_codebars(self, search: str) -> Optional[ProductSchema]:
         self.cursor.execute(f"SELECT * FROM products WHERE codebar='{search}' OR codebarinner='{search}' OR codebarmaster='{search}'")
         obj_out = self.cursor.fetchone()

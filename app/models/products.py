@@ -1,8 +1,8 @@
-from app.models.sale_details import SalesDetail
-from app.db.base_class import Base
+from models.sale_details import SalesDetail
+from db.base_class import Base
 from sqlalchemy import Column, String, DateTime,Integer, Float
 from sqlalchemy.orm import relationship
-from app.models.sale import Sale
+from models.sale import Sale
 from datetime import datetime
 
 class Product(Base):

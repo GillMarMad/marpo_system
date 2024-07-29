@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Response
-from schemas.sale import Sale
-from crud.crud_sells import CRUDsellsObject
+from fastapi import APIRouter, Response, HTTPException
+from schemas.sale import Sale, SaleSchema
+from crud.crud_sales import CRUDsellsObject
 from api.products.onlineShearch import getIdFromCode
 from datetime import datetime
 router = APIRouter()
@@ -33,5 +33,13 @@ def getSell(id_sell : str) -> list[Sale]:
         return []
 
 
-
+@router.post("/postSale", response_model=SaleSchema)
+def postSale(sale : SaleSchema) -> SaleSchema:
+    CRUDsellsObject.OpenConnection()
+    result = CRUDsellsObject.create_sale(sale=sale)
+    CRUDsellsObject.CloseConnection()
+    if type(result) == SaleSchema:
+        return result
+    else:
+        raise HTTPException(status_code=500, detail=result)
     

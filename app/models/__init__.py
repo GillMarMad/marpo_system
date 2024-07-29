@@ -1,3 +1,3 @@
-from app.models.products import Product
-from app.models.sale import Sale
-from app.models.sale_details import SalesDetail
+from models.products import Product
+from models.sale import Sale
+from models.sale_details import SalesDetail
