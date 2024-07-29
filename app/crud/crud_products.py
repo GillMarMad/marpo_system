@@ -1,3 +1,4 @@
+from datetime import datetime
 import psycopg2
 from fastapi.encoders import jsonable_encoder
 from typing import Optional
@@ -53,7 +54,9 @@ class CRUDProducts():
             self.cursor.execute(f"SELECT inventory FROM products WHERE id={id}")
             inventory = self.cursor.fetchone()[0]
             inventory += quantity
-            self.cursor.execute(f"UPDATE products SET inventory={inventory} WHERE id={id}")
+            query = "UPDATE products SET inventory = %s, lastupdate = %s WHERE id = %s"
+            values = (inventory, datetime.now(), id)
+            self.cursor.execute(query, values)
             self.conn.commit()
             return True
         except:
