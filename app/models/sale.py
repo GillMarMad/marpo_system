@@ -1,13 +1,9 @@
-from db.base_class import Base
+# from app.models.products import Product
+from app.db.base_class import Base
 from sqlalchemy import Column, String, DateTime,Integer, Float, ForeignKey, Table
 from sqlalchemy.orm import relationship
 from datetime import datetime
 
-
-sales_products = Table('sales_products', Base.metadata,
-    Column('sale_id', Integer, ForeignKey('sales.id'), primary_key=True),
-    Column('product_id', Integer, ForeignKey('products.id'), primary_key=True)
-)
 
 class Sale(Base):
     __tablename__ = "sales"
@@ -16,4 +12,4 @@ class Sale(Base):
     seller = Column(String, nullable=False)
     costumer = Column(String, nullable=True)
     total = Column(Float, nullable=False)
-    products = relationship('Product', secondary=sales_products, back_populates='sales')
+    products = relationship('products')

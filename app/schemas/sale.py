@@ -5,5 +5,4 @@ class Sale(BaseModel):
     id: int
     date: datetime
     products: str
-    amount: float
     total: float

@@ -54,7 +54,7 @@ class CRUDSells():
     #          return {"mensaje": "Error", "status_code": 404}
 
     def get_sell(self, id_sell: int) -> list[SellSchema]:
-        self.cursor.execute(f"SELECT * FROM sells WHERE id_sell='{id_sell}'")
+        self.cursor.execute(f"SELECT * FROM sales WHERE id='{id_sell}'")
         sells = []
         if self.cursor and self.cursor.rowcount > 0:
             obj_out = self.cursor.fetchall()

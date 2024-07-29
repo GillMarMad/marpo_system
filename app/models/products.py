@@ -1,7 +1,8 @@
-from db.base_class import Base
-from sqlalchemy import Boolean, Column, String, DateTime,Integer, Float, ForeignKey
+from app.models.sale_details import SalesDetail
+from app.db.base_class import Base
+from sqlalchemy import Column, String, DateTime,Integer, Float
 from sqlalchemy.orm import relationship
-from models.sale import sales_products
+from app.models.sale import Sale
 from datetime import datetime
 
 class Product(Base):
@@ -25,4 +26,6 @@ class Product(Base):
     box = Column(Integer, default=0)
     master = Column(Integer, default=0)
     lastupdate = Column(DateTime, default=datetime.now())
-    sales = relationship('Sale', secondary=sales_products, back_populates='products')
+    sales = relationship(Sale, back_populates='sales_details')
+
+    Sale.sales_details = relationship('SalesDetail', order_by=SalesDetail.id, back_populates='sale')
