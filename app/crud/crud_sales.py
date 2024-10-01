@@ -1,11 +1,9 @@
 from datetime import datetime
 import psycopg2
-from fastapi.encoders import jsonable_encoder
-from typing import Optional
 
 
 from core.config import settings
-from schemas.poducts import Product as ProductSchema
+from schemas.products import Product as ProductSchema
 from crud.crud_products import CRUDproductsObject
 from schemas.sale import SaleSchema as SaleSchema
 # from schemas.sale import SellProduct as SellProductSchema
@@ -18,14 +16,15 @@ class CRUDSells():
         self.connected = False
         self.conn = None
         self.cursor = None
-        self.headers_sale = ["id","sale_id","product_id","quantity","sell_price","buy_price","total_price","created_at","updated_at"]
+        self.headers_sale = ["id", "sale_id", "product_id", "quantity", "sell_price", "buy_price", "total_price", "created_at", "updated_at"]
         self.crudeProducts = CRUDproductsObject
+
     def OpenConnection(self):
         self.conn = psycopg2.connect(database=settings.POSTGRES_DB,
-                        host=settings.POSTGRES_SERVER,
-                        user=settings.POSTGRES_USER,
-                        password=settings.POSTGRES_PASSWORD,
-                        port=settings.POSTGRES_PORT)
+                                     host=settings.POSTGRES_SERVER,
+                                     user=settings.POSTGRES_USER,
+                                     password=settings.POSTGRES_PASSWORD,
+                                     port=settings.POSTGRES_PORT)
         self.cursor = self.conn.cursor()
         self.connected = True
 
@@ -34,7 +33,7 @@ class CRUDSells():
             self.cursor.execute(f"SELECT * FROM products WHERE id='{s.product_id}'")
             obj_out = self.cursor.fetchone()
             if obj_out:
-                obj_out = {x:y for x,y in zip(self.crudeProducts.headers, obj_out)}
+                obj_out = {x: y for x, y in zip(self.crudeProducts.headers, obj_out)}
                 obj_out = ProductSchema(**obj_out)
             else:
                 return "Producto no encontrado"
@@ -53,7 +52,7 @@ class CRUDSells():
             self.cursor.execute(f"SELECT * FROM products WHERE id='{s.product_id}'")
             obj_out = self.cursor.fetchone()
             if obj_out:
-                obj_out = {x:y for x,y in zip(self.crudeProducts.headers, obj_out)}
+                obj_out = {x: y for x, y in zip(self.crudeProducts.headers, obj_out)}
                 obj_out = ProductSchema(**obj_out)
             sale_detail_query = f"""
             INSERT INTO sales_details (sale_id,product_id,quantity,sell_price,buy_price,total_price,created_at,updated_at) 
@@ -63,7 +62,7 @@ class CRUDSells():
                 self.cursor.execute(sale_detail_query)
             except:
                 return "Error creando detalle de venta"
-           
+
             self.conn.commit()
             update_stock = self.crudeProducts.upgdate_stock(s.product_id, -s.quantity)
             if not update_stock:
@@ -78,7 +77,7 @@ class CRUDSells():
             obj_out = self.cursor.fetchall()
             if obj_out:
                 for product in obj_out:
-                    p = {x:y for x,y in zip(self.headers_sell, product)}
+                    p = {x: y for x, y in zip(self.headers_sell, product)}
                     p = SaleSchema(**p)
                     sells.append(p)
         return sells
@@ -99,7 +98,7 @@ class CRUDSells():
         #             p = ProductSchema(**p)
         #             products.append(p)
         # return products
-    
+
     def CloseConnection(self):
         self.conn.rollback()
         self.cursor.close()
@@ -107,5 +106,6 @@ class CRUDSells():
         self.conn = None
         self.cursor = None
         self.connected = False
+
 
 CRUDsellsObject = CRUDSells()

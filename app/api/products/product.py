@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Response
-from schemas.poducts import Product
+from fastapi import APIRouter, Response, HTTPException
+from schemas.products import Product
 from crud.crud_products import CRUDproductsObject
 from api.products.onlineShearch import getIdFromCode, getProductInfo
 from datetime import datetime
+from typing import List
 router = APIRouter()
 
 # @router.post("/addProduct", response_model=Product)
@@ -14,29 +15,34 @@ router = APIRouter()
 
 
 @router.post("/getProduct", response_model=Product)
-def getProduct(search : str) -> Product:
-    CRUDproductsObject.OpenConnection()
+def getProduct(search: str) -> Product:
     result = CRUDproductsObject.get_by_codebars(search)
-    CRUDproductsObject.CloseConnection()
     if result:
         return result
     else:
-        empty = Product(key="None", code=0, codebar="", codebarInner="", codebarMaster="", unit="", description="", brand="", buy=0,retailsale=0,wholesale=0,inventory=0, min_inventory=0,department="",id=0,box=0,master=0,lastUpdate=datetime.now())
+        empty = Product(key="None", code=0, codebar="", codebarInner="", codebarMaster="", unit="", description="", brand="", buy=0,
+                        retailsale=0, wholesale=0, inventory=0, min_inventory=0, department="", id=0, box=0, master=0, lastUpdate=datetime.now())
         return empty
 
 
-@router.get("/searchProduct", response_model=list[Product])
-def searchProduct(search : str) -> Product:
-    CRUDproductsObject.OpenConnection()
-    result = CRUDproductsObject.get_product(search)
-    CRUDproductsObject.CloseConnection()
+@router.get("/searchProduct", response_model=List[Product])
+async def search_product(search: str) -> List[Product]:
+    try:
+        # Realiza la consulta de forma asíncrona
+        result = CRUDproductsObject.get_product(search)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=result)
+        print(f"Error en la consulta: {e}")
+        result = []
+
     if result:
         return result
     else:
         return []
 
+
 @router.get("/getPDF", response_model=str)
-def searchPDF(code : str) -> str:
+def searchPDF(code: str) -> str:
     url = getProductInfo(code)
     if url:
         return url
@@ -48,11 +54,10 @@ def searchPDF(code : str) -> str:
             url = f'https://www.truper.com/ficha_merca/ficha-print.php?code={code.strip()}'
     return url
 
+
 @router.get("/lastUpdatedProducts", response_model=list[Product])
 def lastestProducts() -> Product:
-    CRUDproductsObject.OpenConnection()
     result = CRUDproductsObject.get_lastest_products()
-    CRUDproductsObject.CloseConnection()
     if result:
         return result
     else:
@@ -89,4 +94,3 @@ async def download_brand_image(image_name: str, response: Response):
 
 
 
-    

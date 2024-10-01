@@ -21,12 +21,9 @@ router = APIRouter()
 #     return result
 
 
-
 @router.post("/getSell", response_model=list[Sale])
-def getSell(id_sell : str) -> list[Sale]:
-    CRUDsellsObject.OpenConnection()
+def getSell(id_sell: str) -> list[Sale]:
     result = CRUDsellsObject.get_sell(id_sell=id_sell)
-    CRUDsellsObject.CloseConnection()
     if result:
         return result
     else:
@@ -34,12 +31,9 @@ def getSell(id_sell : str) -> list[Sale]:
 
 
 @router.post("/postSale", response_model=SaleSchema)
-def postSale(sale : SaleSchema) -> SaleSchema:
-    CRUDsellsObject.OpenConnection()
+def postSale(sale: SaleSchema) -> SaleSchema:
     result = CRUDsellsObject.create_sale(sale=sale)
-    CRUDsellsObject.CloseConnection()
-    if type(result) == SaleSchema:
+    if type(result) is SaleSchema:
         return result
     else:
         raise HTTPException(status_code=500, detail=result)
-    

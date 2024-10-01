@@ -7,10 +7,11 @@ def findInList(value, list):
     result = [i for i in list if i['code'] == str(value)]
     return result[0] if len(result) > 0 else {}
 
+
 def getAlternative(code):
     url = "https://www.truper.com/restDataSheet/api/search/products.php"
     response = requests.post(url, headers={}, data={'word': code})
-    if(response.status_code==200):
+    if (response.status_code == 200):
         data = json.loads(response.content)
     if len(data) > 1:
         product = [item for item in data if item['code'] == code]
@@ -30,18 +31,19 @@ def getAlternative(code):
         id = None
     return id
 
+
 def getMain(code):
     url = "https://www.truper.com/restDataSheet2/api/products/searchDownloads.php"
     response = requests.post(url, headers={}, data={'word': code})
     try:
-        if(response.status_code==200):
+        if (response.status_code == 200):
             data = json.loads(response.content)
             if len(data) < 1:
                 return None
             else:
                 data = data['data']
             if len(data) > 1:
-                product = findInList(value=code,list = data)
+                product = findInList(value=code, list=data)
                 if len(product) > 1:
                     id = product['id']
                 else:
@@ -55,6 +57,7 @@ def getMain(code):
     except Exception as e:
         id = None
     return id
+
 
 def getProductInfo(code) -> str:
     pdf = None
@@ -75,12 +78,12 @@ def getProductInfo(code) -> str:
 
         soup = BeautifulSoup(response.text, 'html.parser')
 
-        #find div with id="dataSheetId"
+        # find div with id="dataSheetId"
         input = soup.find(id="descargables_pdf")
         pdf = input.find('a')['href']
     except Exception as e:
         pdf = None
-        
+
     return pdf
 
 
@@ -88,7 +91,7 @@ def getIdFromCode(code):
     id = getMain(code)
     if id:
         return id
-    id =  getAlternative(code)
+    id = getAlternative(code)
     if id:
         return id
     return None
