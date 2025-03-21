@@ -5,15 +5,16 @@ import numpy
 import random
 
 from crud.crud_products import CRUDproductsObject
+from crud.db import get_connection, release_connection
 
 
 def addDataFromCSV():
-    db = CRUDproductsObject
+    # db = CRUDproductsObject
 
-    db.OpenConnection()
+    # db.OpenConnection()
 
-    conn = db.conn
-    cursor = db.cursor
+    conn = get_connection()
+    cursor = conn.cursor()
 
     # cursor.execute("DELETE FROM product *")
     # conn.commit()
@@ -66,7 +67,8 @@ def addDataFromCSV():
     conn.commit()
 
     print(f"----- Uploading Data to DB Finished ----- {time.time() - start_time} s")
-    db.CloseConnection()
+    # db.CloseConnection()
+    release_connection(conn)
 
 
 def dummy_example_addProduct():

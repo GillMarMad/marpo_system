@@ -6,6 +6,7 @@ from core.config import settings
 from schemas.products import Product as ProductSchema
 from crud.crud_products import CRUDproductsObject
 from schemas.sale import SaleSchema as SaleSchema
+from schemas.sale import SaleDetail as SaleDetailSchema
 # from schemas.sale import SellProduct as SellProductSchema
 # from models.products import Product as ProductModel
 # from models.sells import Sells as SellModel
@@ -16,7 +17,7 @@ class CRUDSells():
         self.connected = False
         self.conn = None
         self.cursor = None
-        self.headers_sale = ["id", "sale_id", "product_id", "quantity", "sell_price", "buy_price", "total_price", "created_at", "updated_at"]
+        self.headers_sale = ["id", "sale_id", "product_id", "quantity", "total_price", "created_at", "updated_at", "sell_price", "buy_price"]
         self.crudeProducts = CRUDproductsObject
 
     def OpenConnection(self):
@@ -47,7 +48,7 @@ class CRUDSells():
         last_id = self.cursor.fetchone()[0]
         if not last_id:
             return "No se encontró el id de la venta"
-        self.crudeProducts.OpenConnection()
+        # self.crudeProducts.OpenConnection()
         for s in sale.products:
             self.cursor.execute(f"SELECT * FROM products WHERE id='{s.product_id}'")
             obj_out = self.cursor.fetchone()
@@ -64,21 +65,21 @@ class CRUDSells():
                 return "Error creando detalle de venta"
 
             self.conn.commit()
-            update_stock = self.crudeProducts.upgdate_stock(s.product_id, -s.quantity)
+            update_stock = self.crudeProducts.update_stock(s.product_id, -s.quantity)
             if not update_stock:
                 return "Error updating stock"
-        self.crudeProducts.CloseConnection()
+        # self.crudeProducts.CloseConnection()
         return SaleSchema(**sale.dict())
 
-    def get_sell(self, id_sell: int) -> list[SaleSchema]:
-        self.cursor.execute(f"SELECT * FROM sales WHERE id='{id_sell}'")
+    def get_sell(self, id_sell: int) -> list[SaleDetailSchema]:
+        self.cursor.execute(f"SELECT * FROM sales_details WHERE sale_id='{id_sell}'")
         sells = []
         if self.cursor and self.cursor.rowcount > 0:
             obj_out = self.cursor.fetchall()
             if obj_out:
                 for product in obj_out:
-                    p = {x: y for x, y in zip(self.headers_sell, product)}
-                    p = SaleSchema(**p)
+                    p = {x: y for x, y in zip(self.headers_sale, product)}
+                    p = SaleDetailSchema(**p)
                     sells.append(p)
         return sells
 

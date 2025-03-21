@@ -29,3 +29,4 @@ class Product(Base):
     sales = relationship(Sale, back_populates='sales_details')
 
     Sale.sales_details = relationship('SalesDetail', order_by=SalesDetail.id, back_populates='sale')
+    sales_details = relationship("SalesDetail", back_populates="product")

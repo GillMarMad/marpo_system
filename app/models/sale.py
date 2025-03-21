@@ -12,4 +12,4 @@ class Sale(Base):
     seller = Column(String, nullable=False)
     costumer = Column(String, nullable=True)
     total = Column(Float, nullable=False)
-    products = relationship('products')
+    sales_details = relationship("SalesDetail", back_populates="sale", cascade="all, delete-orphan")

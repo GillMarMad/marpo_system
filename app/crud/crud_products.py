@@ -29,7 +29,7 @@ class CRUDProducts:
                 insert_query = """
                     INSERT INTO products (
                         id, key, code, codebar, codebarInner, codebarMaster, unit, description, brand, buy,
-                        retailsale, wholesale, inventory, min_inventory, department, box, master, origin_id, LastUpdate
+                        retailsale, wholesale, inventory, min_inventory, department, box, master, origin_id, lastupdate
                     ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
                 """
                 cursor.execute(insert_query, db_obj)
